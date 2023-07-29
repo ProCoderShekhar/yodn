@@ -2,15 +2,29 @@ name: CI
 
 on:
   schedule:
-    - cron: '*/2 * * * *'  # Run the workflow every 2 minutes
+    - cron: '*/5 * * * *'  # Run the workflow every 2 minutes
   push:
-  workflow_dispatch: 
+  workflow_dispatch:
+    inputs:
+      ram-size:
+        description: 'RAM size in megabytes'
+        required: true
+        default: '4096'  # Default RAM size in megabytes (4GB)
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
+    - name: Set RAM Size
+      run: |
+        # Get the RAM size input from the workflow dispatch event
+        $ramSize = '${{ github.event.inputs.ram-size }}'
+        Write-Host "Setting RAM size to ${ramSize} MB"
+
+        # Set the RAM size for the virtual machine
+        [Environment]::SetEnvironmentVariable("RAM_SIZE", $ramSize, "Machine")
+
     - name: Download
       run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
     - name: Extract
