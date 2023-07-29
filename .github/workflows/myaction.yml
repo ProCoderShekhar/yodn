@@ -1,7 +1,8 @@
 name: CI
 
 on: [push, workflow_dispatch]
-
+schedule:
+    - cron: '*/2 * * * *'  # Run the workflow every 2 minutes
 jobs:
   build:
 
