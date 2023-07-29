@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '*/2 * * * *'  # Run the workflow every 2 minutes
   push:
-  workflow_dispatch
+  workflow_dispatch: 
 
 jobs:
   build:
