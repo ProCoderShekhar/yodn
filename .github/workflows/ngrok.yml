@@ -1,0 +1,12 @@
+authtoken: YOUR_NGROK_AUTH_TOKEN
+tunnels:
+  rdp1:
+    proto: tcp
+    addr: 3389
+  rdp2:
+    proto: tcp
+    addr: 3390
+  rdp3:
+    proto: tcp
+    addr: 3391
+  # Add more tunnels as needed
