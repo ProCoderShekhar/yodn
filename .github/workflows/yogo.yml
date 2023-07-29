@@ -1,10 +1,6 @@
-name: Multiple RDP Sessions
+name: CI
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -26,25 +22,6 @@ jobs:
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "fAudioCaptureAllowed" -Value 1
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "fAudioPlayBackAllowed" -Value 1
-
-    # Loop to create 10 RDP sessions with 10 tunnels
-    - name: Create Tunnels and RDP Sessions
-      run: |
-        # Loop from 1 to 10
-        for ($i=1; $i -le 10; $i++) {
-          # Set a unique username and password for each session
-          $username = "user$i"
-          $password = "P@ssw0rd$i!"
-          
-          # Create a new local user
-          net user $username $password /add
-          
-          # Grant the user necessary permissions
-          net localgroup "Remote Desktop Users" $username /add
-          
-          # Create the ngrok tunnel for this session
-          .\ngrok\ngrok.exe tcp 3389
-          
-          # Wait for a moment before starting the next iteration
-          Start-Sleep -Seconds 5
-        }
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - name: Create Tunnel
+      run: .\ngrok\ngrok.exe tcp 3389
