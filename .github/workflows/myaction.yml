@@ -1,10 +1,6 @@
-name: Multiple RDP Sessions
+name: CIO
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -17,7 +13,9 @@ jobs:
     - name: Extract
       run: Expand-Archive ngrok.zip
     - name: Auth
-      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      run: |
+        .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        .\ngrok\ngrok.exe authtoken ${{ secrets.TKN }}
       env:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
     - name: Enable TS
@@ -26,7 +24,10 @@ jobs:
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "fAudioCaptureAllowed" -Value 1
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "fAudioPlayBackAllowed" -Value 1
-
-    # Create the ngrok tunnels using the configuration file
-    - name: Create Tunnels
-      run: .\ngrok\ngrok.exe start --config ./ngrok_config/ngrok.yml
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - name: Create Tunnel with Env Variable
+      run: .\ngrok\ngrok.exe tcp 3389
+    - name: Create Tunnel with Secret
+      run: .\ngrok\ngrok.exe tcp 3389
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.TKN }}
