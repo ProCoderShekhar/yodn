@@ -1,4 +1,4 @@
-authtoken: YOUR_NGROK_AUTH_TOKEN
+authtoken: 2TCqBqbMntraUqTbL8E4YSpN3kG_45pz87dC2sfoVArSmVuMj
 tunnels:
   rdp1:
     proto: tcp
