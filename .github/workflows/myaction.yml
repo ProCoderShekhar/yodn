@@ -1,4 +1,4 @@
-name: CIO
+name: CI
 
 on: [push, workflow_dispatch]
 
@@ -28,6 +28,6 @@ jobs:
     - name: Create Tunnel with Env Variable
       run: .\ngrok\ngrok.exe tcp 3389
     - name: Create Tunnel with Secret
-      run: .\ngrok\ngrok.exe tcp 3389
+      run: .\ngrok\ngrok.exe tcp 3249
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.TKN }}
