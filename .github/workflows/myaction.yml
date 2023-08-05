@@ -30,5 +30,4 @@ jobs:
       run: .\ngrok\ngrok.exe tcp 3389
     - name: Create Tunnel with Secret
       run: .\ngrok\ngrok.exe tcp 3249
-        env:
-          NGROK_AUTH_TOKEN: ${{ secrets.TKN }}
+
