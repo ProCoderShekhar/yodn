@@ -1,12 +1,35 @@
-authtoken: 2TCqBqbMntraUqTbL8E4YSpN3kG_45pz87dC2sfoVArSmVuMj
-tunnels:
-  rdp1:
-    proto: tcp
-    addr: 3389
-  rdp2:
-    proto: tcp
-    addr: 3390
-  rdp3:
-    proto: tcp
-    addr: 3391
-  # Add more tunnels as needed
+name: CI
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch name as per your needs
+  workflow_dispatch:
+  
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Download ngrok
+      run: |
+        Invoke-WebRequest -Uri 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip' -OutFile ngrok.zip
+        Expand-Archive ngrok.zip -DestinationPath ngrok
+    - name: Authenticate with ngrok
+      run: |
+        .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Enable Remote Desktop
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "fAudioCaptureAllowed" -Value 1
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "fAudioPlayBackAllowed" -Value 1
+        Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - name: Create Tunnel for RDP
+      run: .\ngrok\ngrok.exe tcp 3389
+    - name: Create Tunnel for Service on Port 3249
+      run: .\ngrok\ngrok.exe tcp 3249
