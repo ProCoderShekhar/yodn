@@ -35,4 +35,4 @@ jobs:
         id: ip
 
       - name: Display IP address
-        run: echo "IP Address: ${{ steps.ip.outputs.stdout }}"
+        run: echo "IP Address:"
