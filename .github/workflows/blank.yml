@@ -1,0 +1,38 @@
+name: Setup and Firewall
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  setup_and_firewall:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install ufw and enable
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ufw
+          sudo ufw --force enable
+
+      - name: Install OpenSSH Server
+        run: sudo apt-get install -y openssh-server
+
+      - name: Allow SSH traffic
+        run: sudo ufw allow 22
+
+      - name: Check ufw status
+        run: sudo ufw status
+
+      - name: Get IP address
+        run: hostname -I
+        id: ip
+
+      - name: Display IP address
+        run: echo "IP Address: ${{ steps.ip.outputs.stdout }}"
